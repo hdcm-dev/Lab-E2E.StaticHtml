@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Movilidad Urbana — Localidades</title>
+  <link rel="stylesheet" href="vendor/bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body class="bg-body-tertiary">
+  <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html" data-testid="marca">Movilidad Urbana</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+              aria-controls="menu" aria-expanded="false" aria-label="Alternar navegación">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="menu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html" data-testid="nav-inicio">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="localidades.html" data-testid="nav-localidades">Localidades</a></li>
+          <li class="nav-item"><a class="nav-link" href="encuesta.html" data-testid="nav-encuesta">Encuesta</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <h1 class="mb-4" data-testid="titulo">Localidades</h1>
+
+    <div id="aviso" class="alert d-none" role="alert" data-testid="aviso"></div>
+
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="card shadow-sm">
+          <div class="card-header" data-testid="titulo-formulario">Alta de localidad</div>
+          <div class="card-body">
+            <form id="formulario" novalidate data-testid="formulario">
+              <input type="hidden" id="id" name="id">
+
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre" name="nombre"
+                       data-testid="campo-nombre" autocomplete="off" required maxlength="60">
+                <div class="invalid-feedback" data-testid="error-nombre"></div>
+              </div>
+
+              <div class="mb-3">
+                <label for="provincia" class="form-label">Provincia</label>
+                <select class="form-select" id="provincia" name="provincia" data-testid="campo-provincia" required>
+                  <option value="">Seleccione…</option>
+                  <option>Buenos Aires</option>
+                  <option>Chaco</option>
+                  <option>Córdoba</option>
+                  <option>Corrientes</option>
+                  <option>Entre Ríos</option>
+                  <option>Mendoza</option>
+                  <option>Santa Fe</option>
+                </select>
+                <div class="invalid-feedback" data-testid="error-provincia"></div>
+              </div>
+
+              <div class="mb-3">
+                <label for="codigoPostal" class="form-label">Código postal</label>
+                <input type="text" class="form-control" id="codigoPostal" name="codigoPostal"
+                       data-testid="campo-codigo-postal" autocomplete="off" required
+                       placeholder="4 dígitos, p. ej. 3400">
+                <div class="invalid-feedback" data-testid="error-codigo-postal"></div>
+              </div>
+
+              <div class="mb-3">
+                <label for="habitantes" class="form-label">Habitantes</label>
+                <input type="number" class="form-control" id="habitantes" name="habitantes"
+                       data-testid="campo-habitantes" min="1" step="1" required>
+                <div class="invalid-feedback" data-testid="error-habitantes"></div>
+              </div>
+
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary" data-testid="boton-guardar">Guardar</button>
+                <button type="button" class="btn btn-outline-secondary" id="cancelar"
+                        data-testid="boton-cancelar">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="card shadow-sm">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Listado</span>
+            <span class="badge text-bg-secondary" data-testid="contador">0</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0 align-middle" data-testid="tabla">
+              <thead>
+                <tr>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Provincia</th>
+                  <th scope="col">CP</th>
+                  <th scope="col" class="text-end">Habitantes</th>
+                  <th scope="col" class="text-end">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="cuerpoTabla" data-testid="cuerpo-tabla"></tbody>
+            </table>
+          </div>
+          <div class="card-body d-none" id="sinDatos" data-testid="sin-datos">
+            No hay localidades cargadas.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!--
+    Sin la clase `fade`: con la animación, un click sobre «Eliminar» que llegue mientras el diálogo
+    todavía se está abriendo es descartado por Bootstrap y el modal queda trabado. Aparecer de golpe
+    evita esa ventana de carrera, tanto para la persona que usa la página como para las pruebas.
+  -->
+  <div class="modal" id="modalBorrar" tabindex="-1" aria-hidden="true" aria-labelledby="tituloModalBorrar">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="tituloModalBorrar">Confirmar baja</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          ¿Eliminar la localidad <strong data-testid="modal-nombre"></strong>?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                  data-testid="boton-cancelar-baja">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="confirmarBorrado"
+                  data-testid="boton-confirmar-baja">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="container py-4 text-body-secondary border-top">
+    <small>Lab-E2E.StaticHtml — laboratorio de pruebas E2E</small>
+  </footer>
+
+  <script src="vendor/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/localidades.js"></script>
+</body>
+</html>

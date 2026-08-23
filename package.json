@@ -1,0 +1,21 @@
+{
+  "name": "lab-e2e-statichtml",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Demostración de pruebas E2E con Playwright sobre un sitio HTML estático con Bootstrap 5",
+  "scripts": {
+    "servir": "node scripts/servidor.mjs",
+    "test": "playwright test",
+    "test:chromium": "playwright test --project=chromium",
+    "test:ui": "playwright test --ui",
+    "test:depurar": "playwright test --debug",
+    "reporte": "playwright show-report",
+    "codegen": "playwright codegen http://127.0.0.1:4173"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

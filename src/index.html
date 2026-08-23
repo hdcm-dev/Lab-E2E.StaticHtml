@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Movilidad Urbana — Inicio</title>
+  <link rel="stylesheet" href="vendor/bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body class="bg-body-tertiary">
+  <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html" data-testid="marca">Movilidad Urbana</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+              aria-controls="menu" aria-expanded="false" aria-label="Alternar navegación">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="menu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html" data-testid="nav-inicio">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="localidades.html" data-testid="nav-localidades">Localidades</a></li>
+          <li class="nav-item"><a class="nav-link" href="encuesta.html" data-testid="nav-encuesta">Encuesta</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-5">
+    <h1 class="mb-3" data-testid="titulo">Demostración de pruebas E2E</h1>
+    <p class="lead">
+      Dos pantallas típicas de una aplicación de gestión, servidas como HTML estático, para practicar
+      pruebas de extremo a extremo con Playwright y su integración en la cadena de desarrollo.
+    </p>
+
+    <div class="row g-4 mt-1">
+      <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h2 class="card-title h5">ABM de localidades</h2>
+            <p class="card-text">
+              Alta, baja y modificación sobre una tabla, con validación de formulario y persistencia
+              en <code>localStorage</code>.
+            </p>
+            <a href="localidades.html" class="btn btn-primary" data-testid="ir-localidades">Abrir ABM</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h2 class="card-title h5">Encuesta de transporte</h2>
+            <p class="card-text">
+              Asistente de tres pasos: datos de la persona, medios que utiliza para viajar y distancia
+              recorrida, con resumen final.
+            </p>
+            <a href="encuesta.html" class="btn btn-primary" data-testid="ir-encuesta">Abrir encuesta</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="container py-4 text-body-secondary border-top">
+    <small>Lab-E2E.StaticHtml — laboratorio de pruebas E2E</small>
+  </footer>
+
+  <script src="vendor/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
