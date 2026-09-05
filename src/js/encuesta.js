@@ -1,5 +1,15 @@
-/** Asistente de encuesta en tres pasos, con validación por paso y resumen final. */
-(function () {
+/**
+ * Superficie «Encuesta»: asistente de tres pasos, con validación por paso y acuse final.
+ *
+ * Los pasos NO son una variable de recorrido: son estados de la superficie —`paso-1`, `paso-2`,
+ * `paso-3`, `exito`— declarados en el marcado con `data-mq-estado`. El armazón los releva del DOM
+ * y los conmuta; acá sólo se resuelve lo que no se arregla mostrando y ocultando: el indicador de
+ * pasos, los rótulos, la barra de avance y el foco.
+ *
+ * El acto es divisible y reanudable dentro de la sesión —se puede volver atrás sin perder lo
+ * cargado—, que es la condición que habilita un asistente en vez de una superficie única.
+ */
+(function (global) {
   'use strict';
 
   var TOTAL_PASOS = 3;
@@ -7,6 +17,11 @@
     1: 'Datos de la persona',
     2: 'Medios que utiliza para viajar',
     3: 'Distancia recorrida'
+  };
+  var ANCHOS_DE_BARRA = {
+    1: 'mq-progreso__barra--1de3',
+    2: 'mq-progreso__barra--2de3',
+    3: 'mq-progreso__barra--3de3'
   };
   var ETIQUETAS_FRECUENCIA = {
     diaria: 'Todos los días',
@@ -22,90 +37,92 @@
     tren: 'Tren'
   };
 
-  var formulario = document.getElementById('formulario');
-  var resumen = document.getElementById('resumen');
-  var etiquetaPaso = document.querySelector('[data-testid="etiqueta-paso"]');
-  var indicadorPaso = document.querySelector('[data-testid="indicador-paso"]');
-  var barra = document.getElementById('barraProgreso');
-  var contenedorProgreso = document.querySelector('[data-testid="progreso-contenedor"]');
-  var botonAnterior = document.getElementById('anterior');
-  var botonSiguiente = document.getElementById('siguiente');
-  var botonFinalizar = document.getElementById('finalizar');
-  var botonReiniciar = document.getElementById('reiniciar');
-  var errorMedios = document.querySelector('[data-testid="error-medios"]');
+  var M = null;
+  var etiquetaPaso;
+  var indicadorPaso;
+  var anuncioPaso;
+  var barra;
+  var contenedorProgreso;
+  var botonAnterior;
 
   var pasoActual = 1;
-
-  function seccion(numero) {
-    return document.querySelector('[data-paso="' + numero + '"]');
-  }
+  var arranque = true;
 
   function mediosSeleccionados() {
-    return Array.prototype.map.call(
-      document.querySelectorAll('input[name="medios"]:checked'),
-      function (entrada) { return entrada.value; }
-    );
+    return M.$$('input[name="medios"]:checked').map(function (entrada) {
+      return entrada.value;
+    });
   }
 
+  /* ----------------------------------------------------------------------------------------- *
+   * Validación por paso
+   *
+   * La maqueta de un producto no valida; este laboratorio sí, porque la validación es justamente
+   * lo que las pruebas de extremo a extremo ejercitan. Cada mensaje queda asociado a su campo por
+   * `aria-describedby`, que es lo que el catálogo pide.
+   * ----------------------------------------------------------------------------------------- */
   function validarPaso(numero) {
     var errores = 0;
 
     if (numero === 1) {
-      var nombre = document.getElementById('nombre');
-      var edad = document.getElementById('edad');
-      var localidad = document.getElementById('localidad');
-      [nombre, edad, localidad].forEach(App.limpiarError);
+      var nombre = M.$('#nombre');
+      var edad = M.$('#edad');
+      var localidad = M.$('#localidad');
+      [nombre, edad, localidad].forEach(M.limpiarError);
 
       if (nombre.value.trim().length < 3) {
-        App.marcarError(nombre, 'Ingrese nombre y apellido (mínimo 3 caracteres).');
+        M.marcarError(nombre, 'Ingrese nombre y apellido (mínimo 3 caracteres).');
         errores += 1;
       }
       var valorEdad = Number(edad.value);
       if (!edad.value || !Number.isInteger(valorEdad) || valorEdad < 16 || valorEdad > 110) {
-        App.marcarError(edad, 'La edad debe estar entre 16 y 110 años.');
+        M.marcarError(edad, 'La edad debe estar entre 16 y 110 años.');
         errores += 1;
       }
       if (!localidad.value) {
-        App.marcarError(localidad, 'Seleccione una localidad.');
+        M.marcarError(localidad, 'Seleccione una localidad.');
         errores += 1;
       }
     }
 
     if (numero === 2) {
-      var frecuencia = document.getElementById('frecuencia');
-      App.limpiarError(frecuencia);
-      errorMedios.classList.add('d-none');
+      var frecuencia = M.$('#frecuencia');
+      var errorMedios = M.$('[data-testid="error-medios"]');
+      M.limpiarError(frecuencia);
       errorMedios.textContent = '';
+      errorMedios.hidden = true;
 
       if (mediosSeleccionados().length === 0) {
         errorMedios.textContent = 'Seleccione al menos un medio de transporte.';
-        errorMedios.classList.remove('d-none');
+        errorMedios.hidden = false;
         errores += 1;
       }
       if (!frecuencia.value) {
-        App.marcarError(frecuencia, 'Seleccione la frecuencia de uso.');
+        M.marcarError(frecuencia, 'Seleccione la frecuencia de uso.');
         errores += 1;
       }
     }
 
     if (numero === 3) {
-      var distancia = document.getElementById('distancia');
-      var minutos = document.getElementById('minutos');
-      var motivo = document.getElementById('motivo');
-      [distancia, minutos, motivo].forEach(App.limpiarError);
+      var distancia = M.$('#distancia');
+      var minutos = M.$('#minutos');
+      var motivo = M.$('#motivo');
+      [distancia, minutos, motivo].forEach(M.limpiarError);
 
       var valorDistancia = Number(distancia.value);
-      if (distancia.value === '' || Number.isNaN(valorDistancia) || valorDistancia < 0 || valorDistancia > 500) {
-        App.marcarError(distancia, 'Ingrese una distancia entre 0 y 500 km.');
+      if (distancia.value === '' || Number.isNaN(valorDistancia) ||
+          valorDistancia < 0 || valorDistancia > 500) {
+        M.marcarError(distancia, 'Ingrese una distancia entre 0 y 500 km.');
         errores += 1;
       }
       var valorMinutos = Number(minutos.value);
-      if (!minutos.value || !Number.isInteger(valorMinutos) || valorMinutos < 1 || valorMinutos > 600) {
-        App.marcarError(minutos, 'Ingrese un tiempo entre 1 y 600 minutos.');
+      if (!minutos.value || !Number.isInteger(valorMinutos) ||
+          valorMinutos < 1 || valorMinutos > 600) {
+        M.marcarError(minutos, 'Ingrese un tiempo entre 1 y 600 minutos.');
         errores += 1;
       }
       if (!motivo.value) {
-        App.marcarError(motivo, 'Seleccione el motivo principal del viaje.');
+        M.marcarError(motivo, 'Seleccione el motivo principal del viaje.');
         errores += 1;
       }
     }
@@ -113,66 +130,92 @@
     return errores === 0;
   }
 
-  function pintarPaso() {
-    for (var numero = 1; numero <= TOTAL_PASOS; numero += 1) {
-      seccion(numero).hidden = numero !== pasoActual;
-    }
-
-    var porcentaje = Math.round((pasoActual / TOTAL_PASOS) * 100);
-    barra.style.width = porcentaje + '%';
-    contenedorProgreso.setAttribute('aria-valuenow', String(porcentaje));
-    etiquetaPaso.textContent = 'Paso ' + pasoActual + ' de ' + TOTAL_PASOS + ' — ' + TITULOS[pasoActual];
-    indicadorPaso.textContent = pasoActual + '/' + TOTAL_PASOS;
-
-    botonAnterior.disabled = pasoActual === 1;
-    botonSiguiente.classList.toggle('d-none', pasoActual === TOTAL_PASOS);
-    botonFinalizar.classList.toggle('d-none', pasoActual !== TOTAL_PASOS);
+  /* ----------------------------------------------------------------------------------------- *
+   * Indicador de pasos y avance
+   * ----------------------------------------------------------------------------------------- */
+  function pintarIndicadorDePasos(numero) {
+    M.$$('[data-mq-paso]').forEach(function (item) {
+      var propio = Number(item.getAttribute('data-mq-paso'));
+      item.className = 'mq-paso ' + (propio < numero ? 'mq-paso--completado'
+        : propio === numero ? 'mq-paso--actual' : 'mq-paso--pendiente');
+      if (propio === numero) {
+        item.setAttribute('aria-current', 'step');
+      } else {
+        item.removeAttribute('aria-current');
+      }
+      // El paso completado se marca con tilde; el resto conserva su número.
+      M.$('.mq-paso__marca', item).textContent = propio < numero ? '✓' : String(propio);
+    });
   }
 
+  function pintarAvance(numero) {
+    var porcentaje = Math.round((numero / TOTAL_PASOS) * 100);
+    Object.keys(ANCHOS_DE_BARRA).forEach(function (clave) {
+      barra.classList.remove(ANCHOS_DE_BARRA[clave]);
+    });
+    barra.classList.add(ANCHOS_DE_BARRA[numero]);
+    contenedorProgreso.setAttribute('aria-valuenow', String(porcentaje));
+  }
+
+  function pintarPaso(numero) {
+    pasoActual = numero;
+    pintarIndicadorDePasos(numero);
+    pintarAvance(numero);
+
+    etiquetaPaso.textContent = 'Paso ' + numero + ' de ' + TOTAL_PASOS + ' — ' + TITULOS[numero];
+    indicadorPaso.textContent = numero + '/' + TOTAL_PASOS;
+    anuncioPaso.textContent = 'Paso ' + numero + ' de ' + TOTAL_PASOS + ': ' + TITULOS[numero];
+    botonAnterior.disabled = numero === 1;
+
+    // El foco va al encabezado del paso nuevo, no al arrancar la página.
+    if (!arranque) M.$('#mq-main').focus();
+  }
+
+  function pintarCierre() {
+    pintarIndicadorDePasos(TOTAL_PASOS + 1);
+    pintarAvance(TOTAL_PASOS);
+    etiquetaPaso.textContent = 'Encuesta completada';
+    indicadorPaso.textContent = TOTAL_PASOS + '/' + TOTAL_PASOS;
+    anuncioPaso.textContent = 'Encuesta registrada.';
+  }
+
+  /* ----------------------------------------------------------------------------------------- *
+   * Recolección y acuse
+   * ----------------------------------------------------------------------------------------- */
   function recolectar() {
     return {
-      id: App.nuevoId('enc'),
-      nombre: document.getElementById('nombre').value.trim(),
-      edad: Number(document.getElementById('edad').value),
-      localidad: document.getElementById('localidad').value,
+      id: M.nuevoId('enc'),
+      nombre: M.$('#nombre').value.trim(),
+      edad: Number(M.$('#edad').value),
+      localidad: M.$('#localidad').value,
       medios: mediosSeleccionados(),
-      frecuencia: document.getElementById('frecuencia').value,
-      distancia: Number(document.getElementById('distancia').value),
-      minutos: Number(document.getElementById('minutos').value),
-      motivo: document.getElementById('motivo').value
+      frecuencia: M.$('#frecuencia').value,
+      distancia: Number(M.$('#distancia').value),
+      minutos: Number(M.$('#minutos').value),
+      motivo: M.$('#motivo').value
     };
   }
 
   function texto(testid, valor) {
-    document.querySelector('[data-testid="' + testid + '"]').textContent = valor;
+    M.$('[data-testid="' + testid + '"]').textContent = valor;
   }
 
-  function mostrarResumen(respuesta) {
+  function renderResumen(respuesta) {
     texto('resumen-persona', respuesta.nombre + ' (' + respuesta.edad + ' años)');
     texto('resumen-localidad', respuesta.localidad);
     texto('resumen-medios', respuesta.medios.map(function (medio) {
       return ETIQUETAS_MEDIOS[medio];
     }).join(', '));
     texto('resumen-frecuencia', ETIQUETAS_FRECUENCIA[respuesta.frecuencia]);
-    texto('resumen-distancia', App.formatearNumero(respuesta.distancia) + ' km');
+    texto('resumen-distancia', M.formatearNumero(respuesta.distancia) + ' km');
     texto('resumen-minutos', respuesta.minutos + ' min');
-    texto('resumen-motivo', document.querySelector('#motivo option[value="' + respuesta.motivo + '"]').textContent);
-
-    formulario.hidden = true;
-    resumen.hidden = false;
-    botonAnterior.classList.add('d-none');
-    botonFinalizar.classList.add('d-none');
-    botonSiguiente.classList.add('d-none');
-    botonReiniciar.classList.remove('d-none');
-    etiquetaPaso.textContent = 'Encuesta completada';
-    indicadorPaso.textContent = '3/3';
-    barra.style.width = '100%';
-    barra.classList.add('bg-success');
+    texto('resumen-motivo', M.$('#motivo option[value="' + respuesta.motivo + '"]').textContent);
   }
 
+  /** El desplegable se alimenta del ABM: es la única fuente de localidades del producto. */
   function cargarLocalidades() {
-    var select = document.getElementById('localidad');
-    App.obtenerLocalidades().forEach(function (localidad) {
+    var select = M.$('#localidad');
+    M.obtenerLocalidades().forEach(function (localidad) {
       var opcion = document.createElement('option');
       opcion.value = localidad.nombre;
       opcion.textContent = localidad.nombre + ' (' + localidad.provincia + ')';
@@ -180,41 +223,61 @@
     });
   }
 
-  botonSiguiente.addEventListener('click', function () {
-    App.ocultarAviso();
-    if (!validarPaso(pasoActual)) {
-      App.mostrarAviso('Complete los datos del paso antes de continuar.', 'danger');
-      return;
-    }
-    if (pasoActual < TOTAL_PASOS) {
-      pasoActual += 1;
-      pintarPaso();
-    }
-  });
+  /* ----------------------------------------------------------------------------------------- *
+   * Hooks de la superficie
+   * ----------------------------------------------------------------------------------------- */
+  global.renderSuperficie = function (fachada) {
+    M = fachada;
 
-  botonAnterior.addEventListener('click', function () {
-    App.ocultarAviso();
-    if (pasoActual > 1) {
-      pasoActual -= 1;
-      pintarPaso();
+    etiquetaPaso = M.$('[data-testid="etiqueta-paso"]');
+    indicadorPaso = M.$('[data-testid="indicador-paso"]');
+    anuncioPaso = M.$('[data-mq-anuncio-paso]');
+    barra = M.$('#barraProgreso');
+    contenedorProgreso = M.$('[data-testid="progreso-contenedor"]');
+    botonAnterior = M.$('#anterior');
+
+    cargarLocalidades();
+
+    M.$('#siguiente').addEventListener('click', function () {
+      M.ocultarAviso();
+      if (!validarPaso(pasoActual)) {
+        M.mostrarAviso('Complete los datos del paso antes de continuar.', 'peligro');
+        return;
+      }
+      if (pasoActual < TOTAL_PASOS) M.aplicarEstado('paso-' + (pasoActual + 1));
+    });
+
+    botonAnterior.addEventListener('click', function () {
+      M.ocultarAviso();
+      if (pasoActual > 1) M.aplicarEstado('paso-' + (pasoActual - 1));
+    });
+
+    M.$('#finalizar').addEventListener('click', function () {
+      M.ocultarAviso();
+      if (!validarPaso(TOTAL_PASOS)) {
+        M.mostrarAviso('Complete los datos del paso antes de continuar.', 'peligro');
+        return;
+      }
+      var respuesta = recolectar();
+      M.agregarEncuesta(respuesta);
+      renderResumen(respuesta);
+      M.aplicarEstado('exito');
+    });
+
+    M.$('#reiniciar').addEventListener('click', function () {
+      global.location.reload();
+    });
+  };
+
+  /** Corre antes de cada pasada de visibilidad, con el identificador del estado que entra. */
+  global.alCambiarEstado = function (id) {
+    if (!M) return;
+    var numero = Number((id.match(/^paso-([1-3])$/) || [])[1]);
+    if (numero) {
+      pintarPaso(numero);
+    } else if (id === 'exito') {
+      pintarCierre();
     }
-  });
-
-  botonFinalizar.addEventListener('click', function () {
-    App.ocultarAviso();
-    if (!validarPaso(TOTAL_PASOS)) {
-      App.mostrarAviso('Complete los datos del paso antes de continuar.', 'danger');
-      return;
-    }
-    var respuesta = recolectar();
-    App.agregarEncuesta(respuesta);
-    mostrarResumen(respuesta);
-  });
-
-  botonReiniciar.addEventListener('click', function () {
-    window.location.reload();
-  });
-
-  cargarLocalidades();
-  pintarPaso();
-})();
+    arranque = false;
+  };
+})(window);

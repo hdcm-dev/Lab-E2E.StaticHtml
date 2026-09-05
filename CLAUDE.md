@@ -6,8 +6,9 @@ sin romper cosas.
 
 ## Cómo ejecutar
 
-**En esta máquina no hay Node ni npm instalados.** Todo pasa por Docker con
-[scripts/e2e.sh](scripts/e2e.sh), que monta el repo en la imagen oficial de Playwright:
+Todo pasa por Docker con [scripts/e2e.sh](scripts/e2e.sh), que monta el repo en la imagen oficial de
+Playwright. Aunque la máquina tenga Node, conviene usarlo igual: fija la versión de los navegadores
+junto al código y es lo mismo que corre la CI.
 
 ```bash
 scripts/e2e.sh npm ci
@@ -23,11 +24,24 @@ lo baja al terminar. Con `URL_BASE` definida no levanta nada y prueba contra esa
 
 ## Reglas del código
 
+- **`src/` está construido según el Template-HTML-SDD-Default.** Antes de tocarlo, leer
+  [docs/Aplicacion-Template-HTML-SDD.md](docs/Aplicacion-Template-HTML-SDD.md): dice qué formas del
+  template rigen acá, cuáles no y por qué. Las tres que más se rompen sin querer:
+  **cero `style=` en línea** (todo valor visual es una clase con nombre que materializa un token),
+  **cero literales de color, tipografía o espaciado fuera del `:root`** de `src/css/estilos.css`, y
+  **el estado de una superficie se declara en el marcado** con `data-mq-estado`, nunca con una rama
+  en JavaScript que muestre y oculte bloques.
 - **Sin frameworks ni dependencias de runtime.** Bootstrap 5.3.8 está vendorizado en
-  `src/vendor/bootstrap/`; no reemplazarlo por un CDN. La única dependencia de desarrollo es
-  `@playwright/test`.
+  `src/vendor/bootstrap/`; no reemplazarlo por un CDN. De Bootstrap queda en uso sólo el reboot, la
+  grilla de la barra y el colapso de la navegación: los componentes son propios, con prefijo `mq-`.
+  La única dependencia de desarrollo es `@playwright/test`.
 - **JavaScript de navegador, ES5-ish, IIFE**, como en `src/js/`. Nada de bundlers ni módulos ESM en
   `src/` (sí en `scripts/servidor.mjs`, que corre en Node).
+- **Inversión de control.** `src/js/main.js` arranca solo y llama a `window.renderSuperficie(App)` de
+  la superficie, y a `window.alCambiarEstado(id)` antes de cada pasada de visibilidad. El archivo de
+  cada superficie **sólo declara** esos hooks y va **antes** de `main.js` en el HTML.
+- **La versión del sello vive en dos lados**: `VERSION` en `src/js/main.js` y `version` en
+  `package.json`. Al subir una, subir la otra.
 - **Todo elemento que una prueba toque lleva `data-testid`.** No escribir selectores por texto,
   clase de Bootstrap ni estructura del DOM.
 - **Todo en castellano**: nombres de variables y funciones, comentarios, textos de la interfaz,
@@ -48,15 +62,20 @@ lo baja al terminar. Con `URL_BASE` definida no levanta nada y prueba contra esa
 
 ## Trampas ya pisadas (no volver a caer)
 
-- **El manejador de `data-bs-dismiss` de Bootstrap corre *antes* que el listener `click` del propio
-  botón.** Verificado con traza de eventos. Por eso el botón de confirmar baja no lleva
-  `data-bs-dismiss`: llama a `modal.hide()` desde su handler, y la baja se aplica en
-  `hidden.bs.modal`, con el diálogo y su fondo ya fuera del DOM.
-- **El modal de baja no lleva la clase `fade`.** Con la animación, un click que llegue mientras el
-  diálogo se abre es descartado por Bootstrap y el modal queda trabado tapando la pantalla.
+- **El diálogo de baja ya no es un modal de Bootstrap, es un `<dialog>` nativo.** Con eso
+  desaparecieron las dos trampas que había acá antes —el manejador delegado de `data-bs-dismiss` que
+  corría antes que el listener del botón, y el modal que quedaba trabado si el click llegaba durante
+  la animación de apertura—: las dos eran de la implementación de Bootstrap. Lo que **sí** sigue
+  valiendo: la baja se aplica en el evento `close` y no en el click, para redibujar la tabla cuando
+  el diálogo ya soltó el foco.
+- **`[hidden]` hay que redeclararlo.** El conmutador de estados apaga bloques con `hidden`, pero las
+  utilitarias de display de Bootstrap le ganan por orden de fuente. La regla está al tope de la
+  sección 2 de `src/css/estilos.css`, que es la última hoja que carga. No sacarla.
 - `reducedMotion: 'reduce'` en la config desactiva las transiciones de Bootstrap. No quitarlo.
 - Las provincias del `<select>` de `src/localidades.html` tienen que cubrir las de las localidades
   sembradas en `main.js` y en `tests/e2e/apoyo.js`; si falta una, la edición de esa fila falla.
+- **Los mensajes de error se buscan por `id`**: `App.marcarError(control, texto)` escribe en el
+  elemento `<id-del-control>-error`. Un campo nuevo sin ese hueco en el marcado se valida en silencio.
 
 ## Workflows
 

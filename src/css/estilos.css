@@ -1,23 +1,933 @@
-/* Ajustes propios; el resto del diseño lo aporta Bootstrap 5. */
+/*
+ * Estilos del sitio, en la forma constructiva del Template-HTML-SDD-Default.
+ *
+ * Se carga DESPUÉS de Bootstrap y lo sobreescribe. Orden interno fijo (§2.4 del documento de
+ * conocimiento `Knowledge-Template-HTML-SDD-Default.md`):
+ *
+ *   1. `:root` con todos los tokens y la única regla de `prefers-reduced-motion`.
+ *   2. Reset acotado, `.mq-sr-only`, `.mq-skip`, `:focus-visible`.
+ *   3. Armazón: barra de navegación superior y pie.
+ *   4. Componentes: botones, campos, bandas, tablas, vacíos, diálogos, pasos, progreso, tarjetas.
+ *   5. Utilitarias de composición con nombre.
+ *   6. El único `@media (max-width: 768px)`.
+ *
+ * Regla de gobierno de los tokens: ningún valor de color, tipografía o espaciado se escribe fuera
+ * de `:root`; un valor visual nuevo se promueve al catálogo antes de usarse.
+ */
+
+/* ------------------------------------------------------------------------------------------- *
+ * 1. Tokens
+ *
+ * Los nombres son los del catálogo (`Design-Rules-Web-Generico.md` §2) y no se tocan: sostienen
+ * la trazabilidad entre el diseño y la implementación. Los valores son los de referencia del
+ * mismo §2. Se omiten dos familias del catálogo por no tener consumidor en este producto:
+ * `--shell-sidebar-width` (no hay barra lateral: la navegación es superior) y los acentos por
+ * módulo `-b`/`-c`/`-d` (no hay módulos funcionales que codificar).
+ * ------------------------------------------------------------------------------------------- */
+:root {
+  /* Superficies */
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f1f1ef;
+  --color-background-tertiary: #f7f6f4;
+
+  /* Texto */
+  --color-text-primary: #1a1a18;
+  --color-text-secondary: #5c5c57;
+  --color-text-tertiary: #8a8a82;
+  --color-text-danger: #a03030;
+  --color-text-on-brand: #ffffff;
+
+  /* Bordes */
+  --color-border-secondary: #d9d9d4;
+  --color-border-tertiary: #e6e6e1;
+  --color-border-danger: #e0b4b4;
+
+  /* Marca */
+  --color-brand-primary: #0f6e56;
+  --color-brand-dark: #04342c;
+  --color-brand-tint: #e1f5ee;
+
+  /* Acento por módulo: codifica pertenencia, no estética */
+  --color-accent-module-a: #0f6e56;
+
+  /* Semánticos, siempre en par texto + tint */
+  --color-text-success: #0f6e56;
+  --color-background-success: #e1f5ee;
+  --color-text-warning: #854f0b;
+  --color-background-warning: #faeeda;
+  --color-text-error: #993556;
+  --color-background-error: #fbeaf0;
+  --color-text-info: #185fa5;
+  --color-background-info: #e7f0f9;
+  --color-border-info: #bbd4ea;
+
+  /* Velo. El catálogo nombra el token pero no fija su valor: se deriva de
+     `--color-text-primary` (#1a1a18) al 45 %, que es el mínimo que separa el diálogo del fondo
+     conservando legible lo que queda detrás. */
+  --color-backdrop: rgba(26, 26, 24, 0.45);
+
+  /* Tipografía. El catálogo pide «una familia sans humanista» sin fijar cuál: se resuelve con la
+     pila del sistema, que no agrega una descarga de red —el sitio es autónomo y vendorizado—. */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --font-size-title: 17px;
+  --font-weight-title: 500;
+  --font-size-body-strong: 14px;
+  --font-weight-body-strong: 500;
+  --font-size-body: 13px;
+  --font-weight-body: 400;
+  --font-size-caption: 12px;
+  --font-weight-caption: 400;
+  --font-size-meta: 11px;
+  --font-weight-meta: 500;
+
+  /* Espaciado, escala base 4 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 14px;
+  --space-5: 16px;
+  --space-6: 18px;
+  --space-7: 20px;
+  --space-8: 22px;
+  --space-9: 28px;
+
+  /* Radios y bordes */
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-pill: 20px;
+  --radius-icon: 12px;
+  --border-hairline: 1px solid var(--color-border-tertiary);
+  --border-control: 1px solid var(--color-border-secondary);
+
+  /* Movimiento */
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-ease: ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ------------------------------------------------------------------------------------------- *
+ * 2. Reset acotado y accesibilidad de base
+ * ------------------------------------------------------------------------------------------- */
+
+/* Bootstrap declara `[hidden]{display:none!important}` en su reboot, pero sus utilitarias de
+   display (`.d-flex`, `.d-grid`…) van después en el mismo archivo y le ganan por orden de fuente.
+   El conmutador de estados apaga bloques con `hidden`, así que la regla se vuelve a declarar acá,
+   que es la última hoja que se carga. */
+[hidden] {
+  display: none !important;
+}
+
 body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--color-background-tertiary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-body);
+  line-height: 1.5;
 }
 
 main {
   flex: 1 0 auto;
 }
 
-.card-header [data-testid="etiqueta-paso"] {
-  font-weight: 500;
+h1 {
+  font-size: calc(var(--font-size-title) + 5px);
+  font-weight: var(--font-weight-title);
+  line-height: 1.2;
+  margin: 0;
 }
 
-.progress {
-  height: 0.5rem;
+h2 {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-title);
+  line-height: 1.2;
+  margin: 0;
 }
 
-table td,
-table th {
+h3 {
+  font-size: var(--font-size-body-strong);
+  font-weight: var(--font-weight-body-strong);
+  line-height: 1.2;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+.mq-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
   white-space: nowrap;
+  border: 0;
+}
+
+/* Salto al contenido: fuera de pantalla hasta que recibe el foco. */
+.mq-skip {
+  position: absolute;
+  left: var(--space-2);
+  top: -100%;
+  z-index: 1080;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+  text-decoration: none;
+}
+
+.mq-skip:focus {
+  top: var(--space-2);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+.mq-topbar :focus-visible {
+  outline-color: var(--color-text-on-brand);
+}
+
+/* ------------------------------------------------------------------------------------------- *
+ * 3. Armazón: barra de navegación superior y pie
+ *
+ * El catálogo (§3.1) describe una barra lateral fija; §8 admite que en viewport angosto colapse a
+ * navegación superior. Acá la navegación es superior en todo ancho: el producto no tiene sesión ni
+ * roles que poblar una barra lateral, y la barra colapsable es justamente el camino que cubre la
+ * configuración `mobile-chrome` de las pruebas. Queda declarado como apartamiento en
+ * `docs/Aplicacion-Template-HTML-SDD.md`.
+ * ------------------------------------------------------------------------------------------- */
+.mq-topbar {
+  background-color: var(--color-brand-dark);
+  padding: var(--space-3) 0;
+}
+
+.mq-topbar .mq-contenedor {
+  display: flex;
+  flex-wrap: inherit;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.mq-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-on-brand);
+  font-size: var(--font-size-body-strong);
+  font-weight: var(--font-weight-body-strong);
+  text-decoration: none;
+  padding: 0;
+}
+
+.mq-topbar .navbar-toggler {
+  border: var(--border-control);
+  border-color: rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-2);
+}
+
+.mq-nav {
+  display: flex;
+  gap: var(--space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mq-nav__enlace {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  color: var(--color-text-on-brand);
+  opacity: 0.72;
+  text-decoration: none;
+  font-size: var(--font-size-body);
+  transition: background-color var(--motion-fast) var(--motion-ease),
+    opacity var(--motion-fast) var(--motion-ease);
+}
+
+.mq-nav__enlace:hover {
+  opacity: 1;
+}
+
+.mq-nav__enlace--activo {
+  background-color: var(--color-brand-primary);
+  opacity: 1;
+}
+
+.mq-pie {
+  border-top: var(--border-hairline);
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-meta);
+  font-weight: var(--font-weight-meta);
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-6);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: space-between;
+}
+
+/* ------------------------------------------------------------------------------------------- *
+ * 4. Componentes
+ * ------------------------------------------------------------------------------------------- */
+
+/* 4.1 Contenedor de página y encabezado de superficie */
+.mq-contenedor {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding-left: var(--space-7);
+  padding-right: var(--space-7);
+}
+
+.mq-superficie {
+  padding-top: var(--space-9);
+  padding-bottom: var(--space-9);
+}
+
+.mq-encabezado {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-9);
+}
+
+.mq-caption {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-caption);
+  color: var(--color-text-secondary);
+}
+
+.mq-prosa {
+  max-width: 62ch;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-strong);
+}
+
+/* 4.2 Tarjeta */
+.mq-tarjeta {
+  background-color: var(--color-background-primary);
+  border: var(--border-hairline);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.mq-tarjeta__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: var(--border-hairline);
+  background-color: var(--color-background-tertiary);
+  font-size: var(--font-size-body-strong);
+  font-weight: var(--font-weight-body-strong);
+}
+
+.mq-tarjeta__cuerpo {
+  padding: var(--space-5);
+}
+
+.mq-tarjeta__pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: var(--border-hairline);
+}
+
+/* 4.3 Tarjeta de acceso (patrón §4.2 del catálogo): toda la tarjeta es el área clicleable */
+.mq-tarjeta-acceso {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+  padding: var(--space-5);
+  background-color: var(--color-background-primary);
+  border: var(--border-hairline);
+  border-radius: var(--radius-lg);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--motion-fast) var(--motion-ease);
+}
+
+.mq-tarjeta-acceso:hover {
+  border-color: var(--color-brand-primary);
+}
+
+.mq-tarjeta-acceso__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-icon);
+  background-color: var(--color-brand-tint);
+  color: var(--color-accent-module-a);
+}
+
+.mq-tarjeta-acceso__descripcion {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-tertiary);
+  flex: 1 0 auto;
+}
+
+.mq-tarjeta-acceso__llamada {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-brand-primary);
+  font-size: var(--font-size-body-strong);
+  font-weight: var(--font-weight-body-strong);
+}
+
+/* 4.4 Botones */
+.mq-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-body-strong);
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease);
+}
+
+.mq-btn--primario {
+  background-color: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+}
+
+.mq-btn--primario:hover {
+  background-color: var(--color-brand-dark);
+  color: var(--color-text-on-brand);
+}
+
+.mq-btn--secundario {
+  background-color: var(--color-background-primary);
+  border-color: var(--color-border-secondary);
+  color: var(--color-text-secondary);
+}
+
+.mq-btn--secundario:hover {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+.mq-btn--destructivo {
+  background-color: var(--color-background-primary);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-danger);
+}
+
+.mq-btn--destructivo:hover {
+  background-color: var(--color-background-error);
+  color: var(--color-text-danger);
+}
+
+.mq-btn--chico {
+  min-height: 28px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-caption);
+}
+
+/* «Anterior» en el primer paso: deshabilitado, a opacidad 0.4 y sin eventos (catálogo §4.5). */
+.mq-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* 4.5 Campos de formulario */
+.mq-campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.mq-label {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-caption);
+  color: var(--color-text-secondary);
+}
+
+.mq-input,
+.mq-select {
+  width: 100%;
+  min-height: 36px;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-control);
+  border-radius: var(--radius-md);
+  background-color: var(--color-background-primary);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: var(--font-size-body);
+}
+
+.mq-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.mq-input--error,
+.mq-select--error {
+  border-color: var(--color-border-danger);
+}
+
+/* El requisito se declara ANTES del intento y se asocia por `aria-describedby`. */
+.mq-requisito {
+  font-size: var(--font-size-meta);
+  font-weight: var(--font-weight-meta);
+  color: var(--color-text-tertiary);
+}
+
+.mq-error {
+  font-size: var(--font-size-meta);
+  font-weight: var(--font-weight-meta);
+  color: var(--color-text-danger);
+}
+
+.mq-opcion {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 24px;
+  font-size: var(--font-size-body);
+}
+
+.mq-opcion input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-brand-primary);
+}
+
+.mq-grupo {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.mq-grupo__leyenda {
+  font-size: var(--font-size-body-strong);
+  font-weight: var(--font-weight-body-strong);
+  margin-bottom: var(--space-3);
+  padding: 0;
+}
+
+/* 4.6 Bandas de resultado. El color nunca es el único canal: la banda siempre lleva su texto. */
+.mq-banda {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-body);
+}
+
+.mq-banda--exito {
+  background-color: var(--color-background-success);
+  border-color: var(--color-background-success);
+  color: var(--color-text-success);
+}
+
+.mq-banda--atencion {
+  background-color: var(--color-background-warning);
+  border-color: var(--color-background-warning);
+  color: var(--color-text-warning);
+}
+
+.mq-banda--peligro {
+  background-color: var(--color-background-error);
+  border-color: var(--color-background-error);
+  color: var(--color-text-error);
+}
+
+.mq-banda--info {
+  background-color: var(--color-background-info);
+  border-color: var(--color-border-info);
+  color: var(--color-text-info);
+}
+
+/* 4.7 Contador de colección */
+.mq-contador {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-meta);
+  font-weight: var(--font-weight-meta);
+}
+
+/* 4.8 Tabla */
+.mq-tabla-envoltorio {
+  overflow-x: auto;
+}
+
+.mq-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-body);
+}
+
+.mq-tabla th,
+.mq-tabla td {
+  white-space: nowrap;
+  padding: var(--space-3) var(--space-5);
+  border-bottom: var(--border-hairline);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.mq-tabla thead th {
+  background-color: var(--color-background-tertiary);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-meta);
+  font-weight: var(--font-weight-meta);
+}
+
+.mq-tabla tbody tr:last-child th,
+.mq-tabla tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.mq-th-plano {
+  font-size: var(--font-size-body-strong);
+  font-weight: var(--font-weight-body-strong);
+}
+
+/* Números tabulares para columnas numéricas (catálogo §2.2). La celda se nombra con la misma
+   especificidad que `.mq-tabla th`, que si no le gana por selector y la columna queda a la izquierda. */
+.mq-num,
+.mq-tabla th.mq-num,
+.mq-tabla td.mq-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.mq-td-acciones {
+  text-align: right;
+}
+
+.mq-acciones-fila {
+  display: inline-flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+/* Avatar de iniciales de la fila de ABM (catálogo §4.3). */
+.mq-iniciales {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: var(--space-2);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-brand-tint);
+  color: var(--color-accent-module-a);
+  font-size: var(--font-size-meta);
+  font-weight: var(--font-weight-meta);
+}
+
+/* 4.9 Estado vacío */
+.mq-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-9) var(--space-5);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.mq-vacio__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-icon);
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-tertiary);
+}
+
+/* 4.10 Diálogo nativo. Velo por `::backdrop` con token, nunca un overlay propio. */
+.mq-dialogo {
+  width: min(30rem, calc(100vw - var(--space-9)));
+  padding: var(--space-6);
+  border: var(--border-hairline);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-background-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+}
+
+.mq-dialogo::backdrop {
+  background-color: var(--color-backdrop);
+}
+
+.mq-dialogo__cuerpo {
+  margin-top: var(--space-4);
+  color: var(--color-text-secondary);
+}
+
+/* Orden fijo del pie: Cancelar primero, acción última. */
+.mq-acciones-pie {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+/* 4.11 Indicador de pasos (catálogo §4.5) */
+.mq-pasos {
+  margin-bottom: var(--space-4);
+}
+
+.mq-pasos-lista {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mq-paso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 1 1 0;
+  position: relative;
+  font-size: var(--font-size-meta);
+  font-weight: var(--font-weight-meta);
+  color: var(--color-text-tertiary);
+}
+
+/* Conector entre pasos: se pinta en marca cuando el paso ya se completó. */
+.mq-paso + .mq-paso::before {
+  content: "";
+  position: absolute;
+  top: 11px;
+  right: 50%;
+  left: -50%;
+  height: 2px;
+  background-color: var(--color-border-secondary);
+}
+
+.mq-paso--completado::before,
+.mq-paso--actual::before {
+  background-color: var(--color-brand-primary) !important;
+}
+
+.mq-paso__marca {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-tertiary);
+}
+
+.mq-paso--actual {
+  color: var(--color-brand-primary);
+}
+
+.mq-paso--actual .mq-paso__marca,
+.mq-paso--completado .mq-paso__marca {
+  background-color: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+}
+
+.mq-paso--completado {
+  color: var(--color-text-secondary);
+}
+
+/* 4.12 Barra de progreso */
+.mq-progreso {
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background-secondary);
+  overflow: hidden;
+}
+
+.mq-progreso__barra {
+  height: 100%;
+  background-color: var(--color-brand-primary);
+  transition: width var(--motion-base) var(--motion-ease);
+}
+
+/* El ancho es un valor visual: vive en una clase con nombre, no en un `style=` en línea. */
+.mq-progreso__barra--1de3 {
+  width: 33.333%;
+}
+
+.mq-progreso__barra--2de3 {
+  width: 66.666%;
+}
+
+.mq-progreso__barra--3de3 {
+  width: 100%;
+}
+
+/* 4.13 Ficha clave/valor */
+.mq-kv {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) 2fr;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+}
+
+.mq-kv__clave {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-caption);
+  color: var(--color-text-secondary);
+}
+
+.mq-kv__valor {
+  margin: 0;
+  font-size: var(--font-size-body);
+}
+
+/* ------------------------------------------------------------------------------------------- *
+ * 5. Utilitarias de composición con nombre
+ *
+ * Existen para que ningún HTML lleve `style=` en línea: cada una materializa un token.
+ * ------------------------------------------------------------------------------------------- */
+.mq-ml-auto {
+  margin-left: auto;
+}
+
+.mq-mt-3 {
+  margin-top: var(--space-3);
+}
+
+.mq-mt-5 {
+  margin-top: var(--space-5);
+}
+
+.mq-mt-9 {
+  margin-top: var(--space-9);
+}
+
+.mq-mb-5 {
+  margin-bottom: var(--space-5);
+}
+
+.mq-ancho-22 {
+  max-width: 22rem;
+}
+
+.mq-grilla-accesos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--space-4);
+}
+
+.mq-grilla-campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+/* Formulario a la izquierda, listado a la derecha: la proporción del ABM. */
+.mq-grilla-abm {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.mq-pila {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mq-entre {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.mq-fila-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* ------------------------------------------------------------------------------------------- *
+ * 6. El único punto de quiebre (catálogo §8: alrededor de 768px)
+ *
+ * Se expresa como 767.98px, que es el borde superior que usa Bootstrap para su breakpoint `md`:
+ * así el colapso de la barra de navegación —que lo resuelve Bootstrap con `navbar-expand-md`— y el
+ * reflujo de las grillas de acá conmutan en el mismo píxel y no hay un ancho intermedio con la
+ * navegación expandida y el contenido ya apilado.
+ * ------------------------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  .mq-contenedor {
+    padding-left: var(--space-5);
+    padding-right: var(--space-5);
+  }
+
+  .mq-nav {
+    flex-direction: column;
+    padding-top: var(--space-3);
+  }
+
+  .mq-grilla-abm {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mq-encabezado {
+    flex-direction: column;
+  }
+
+  /* En pantalla angosta el pie del diálogo invierte: la acción queda arriba, al alcance del pulgar. */
+  .mq-acciones-pie {
+    flex-direction: column-reverse;
+  }
+
+  .mq-acciones-pie > * {
+    width: 100%;
+  }
 }

@@ -15,6 +15,12 @@ Todo es HTML + JavaScript de navegador con **Bootstrap 5.3.8** (vendorizado en
 [src/vendor/bootstrap/](src/vendor/bootstrap/), sin CDN) y **sin framework**. El estado se guarda en
 `localStorage`, así que no hace falta backend.
 
+El sitio está construido según el **Template-HTML-SDD-Default**, la forma constructiva por defecto
+del Framework SDD para maquetas HTML/CSS/JS sin proceso de build: tokens de diseño como variables
+CSS, conmutador declarativo de estados en el marcado, iconografía SVG inline, `<dialog>` nativo y
+WCAG 2.2 AA como piso. Qué se aplicó, qué no y por qué está en
+[docs/Aplicacion-Template-HTML-SDD.md](docs/Aplicacion-Template-HTML-SDD.md).
+
 ## Estructura
 
 ```
@@ -22,10 +28,11 @@ src/                     El sitio estático que se prueba
   index.html             Portada
   localidades.html       ABM
   encuesta.html          Asistente de 3 pasos
-  css/estilos.css        Ajustes propios sobre Bootstrap
-  js/main.js             Utilidades compartidas (almacenamiento, avisos, validación)
-  js/localidades.js      Lógica del ABM
-  js/encuesta.js         Lógica del asistente
+  css/estilos.css        Tokens del catálogo y componentes propios, sobre el reboot de Bootstrap
+  js/main.js             Armazón: fachada, iconos, estados, diálogos, almacenamiento; arranca solo
+  js/inicio.js           Hook de la portada
+  js/localidades.js      Hook del ABM
+  js/encuesta.js         Hook del asistente
   vendor/bootstrap/      Bootstrap 5.3.8
 scripts/
   servidor.mjs           Servidor estático sin dependencias (lo levanta Playwright)
@@ -37,7 +44,12 @@ tests/e2e/
   encuesta.spec.js       Asistente completo
 playwright.config.js     Navegadores, reportes, servidor de pruebas
 .github/workflows/       CI, workflow reutilizable de E2E y verificación de entornos
+docs/                    Registro de la aplicación del template, con sus capturas de evidencia
 ```
+
+Cada superficie se puede abrir directamente en cualquiera de sus estados agregando `?estado=<id>` a
+la dirección —por ejemplo `encuesta.html?estado=paso-3` o `localidades.html?estado=vacio`—, que es lo
+que hace verificable un estado sin tener que recorrer todo el flujo para llegar a él.
 
 ## Cómo correrlo
 
@@ -87,8 +99,10 @@ URL_BASE=https://ejemplo.test scripts/e2e.sh npx playwright test --project=chrom
 
 Dos defectos reales de la página aparecieron al escribir estas pruebas y se corrigieron en el código,
 no en las pruebas: el modal de baja quedaba trabado si el click llegaba durante la animación de
-apertura, y el manejador delegado de `data-bs-dismiss` de Bootstrap corre **antes** que el listener
-del propio botón, con lo que la baja se aplicaba con la bandera equivocada.
+apertura, y el manejador delegado de `data-bs-dismiss` de Bootstrap corría **antes** que el listener
+del propio botón, con lo que la baja se aplicaba con la bandera equivocada. Los dos eran defectos del
+modal de Bootstrap y dejaron de existir cuando el diálogo pasó a ser un `<dialog>` nativo; se dejan
+anotados porque explican por qué la baja se sigue aplicando al cerrarse el diálogo y no en el click.
 
 ## Los workflows
 
@@ -171,6 +185,14 @@ Estado verificado en esta máquina el 2026-08-23, con la imagen
 ```
 $ scripts/e2e.sh npx playwright test
   80 passed (55.0s)
+```
+
+Vuelto a verificar el 2026-09-04, con la misma imagen, después de reconstruir `src/` según el
+Template-HTML-SDD-Default y **sin tocar un solo archivo de `tests/e2e/`**:
+
+```
+$ scripts/e2e.sh npx playwright test
+  80 passed (40.7s)
 ```
 
 Son 20 pruebas por cada una de las 4 configuraciones de navegador. Los workflows, en cambio, no se

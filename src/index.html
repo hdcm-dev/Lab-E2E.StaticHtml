@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-AR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,64 +7,77 @@
   <link rel="stylesheet" href="vendor/bootstrap/bootstrap.min.css">
   <link rel="stylesheet" href="css/estilos.css">
 </head>
-<body class="bg-body-tertiary">
-  <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
-    <div class="container">
-      <a class="navbar-brand" href="index.html" data-testid="marca">Movilidad Urbana</a>
+<body data-superficie="Inicio" data-destino="inicio" data-estado-inicial="con-datos">
+  <a class="mq-skip" href="#mq-main">Ir al contenido</a>
+
+  <nav class="navbar navbar-expand-md mq-topbar" data-bs-theme="dark" aria-label="Navegación principal">
+    <div class="mq-contenedor">
+      <a class="mq-marca" href="index.html" data-testid="marca" data-mq-ico-marca>Movilidad Urbana</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
               aria-controls="menu" aria-expanded="false" aria-label="Alternar navegación">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="menu">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="index.html" data-testid="nav-inicio">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="localidades.html" data-testid="nav-localidades">Localidades</a></li>
-          <li class="nav-item"><a class="nav-link" href="encuesta.html" data-testid="nav-encuesta">Encuesta</a></li>
+        <ul class="mq-nav mq-ml-auto">
+          <li><a class="mq-nav__enlace" href="index.html" data-testid="nav-inicio" data-mq-destino="inicio">Inicio</a></li>
+          <li><a class="mq-nav__enlace" href="localidades.html" data-testid="nav-localidades" data-mq-destino="localidades">Localidades</a></li>
+          <li><a class="mq-nav__enlace" href="encuesta.html" data-testid="nav-encuesta" data-mq-destino="encuesta">Encuesta</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <main class="container py-5">
-    <h1 class="mb-3" data-testid="titulo">Demostración de pruebas E2E</h1>
-    <p class="lead">
-      Dos pantallas típicas de una aplicación de gestión, servidas como HTML estático, para practicar
-      pruebas de extremo a extremo con Playwright y su integración en la cadena de desarrollo.
-    </p>
-
-    <div class="row g-4 mt-1">
-      <div class="col-md-6">
-        <div class="card h-100 shadow-sm">
-          <div class="card-body">
-            <h2 class="card-title h5">ABM de localidades</h2>
-            <p class="card-text">
-              Alta, baja y modificación sobre una tabla, con validación de formulario y persistencia
-              en <code>localStorage</code>.
-            </p>
-            <a href="localidades.html" class="btn btn-primary" data-testid="ir-localidades">Abrir ABM</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card h-100 shadow-sm">
-          <div class="card-body">
-            <h2 class="card-title h5">Encuesta de transporte</h2>
-            <p class="card-text">
-              Asistente de tres pasos: datos de la persona, medios que utiliza para viajar y distancia
-              recorrida, con resumen final.
-            </p>
-            <a href="encuesta.html" class="btn btn-primary" data-testid="ir-encuesta">Abrir encuesta</a>
-          </div>
-        </div>
+  <main id="mq-main" tabindex="-1" class="mq-contenedor mq-superficie">
+    <div class="mq-encabezado">
+      <div>
+        <h1 data-testid="titulo">Demostración de pruebas E2E</h1>
+        <p class="mq-prosa mq-mt-3">
+          Dos pantallas típicas de una aplicación de gestión, servidas como HTML estático, para
+          practicar pruebas de extremo a extremo con Playwright y su integración en la cadena de
+          desarrollo.
+        </p>
       </div>
     </div>
+
+    <div class="mq-grilla-accesos">
+      <a class="mq-tarjeta-acceso" href="localidades.html" data-testid="ir-localidades">
+        <span class="mq-tarjeta-acceso__icono" data-mq-ico-listado></span>
+        <h2>ABM de localidades</h2>
+        <p class="mq-tarjeta-acceso__descripcion">
+          Alta, baja y modificación sobre una tabla, con validación de formulario y persistencia
+          en el almacenamiento del navegador.
+        </p>
+        <span class="mq-tarjeta-acceso__llamada">Abrir ABM<span data-mq-ico-avanzar></span></span>
+      </a>
+
+      <a class="mq-tarjeta-acceso" href="encuesta.html" data-testid="ir-encuesta">
+        <span class="mq-tarjeta-acceso__icono" data-mq-ico-formulario></span>
+        <h2>Encuesta de transporte</h2>
+        <p class="mq-tarjeta-acceso__descripcion">
+          Asistente de tres pasos: datos de la persona, medios que utiliza para viajar y distancia
+          recorrida, con resumen final.
+        </p>
+        <span class="mq-tarjeta-acceso__llamada">Abrir encuesta<span data-mq-ico-avanzar></span></span>
+      </a>
+    </div>
+
+    <!--
+      Bloque de vacío declarado para que la ausencia sea deliberada: la portada no presenta
+      ninguna colección, y el conmutador de estados igual lo releva del DOM.
+    -->
+    <section class="mq-vacio" data-mq-estado="vacio" aria-labelledby="in-vacio-h">
+      <h2 id="in-vacio-h">No aplica</h2>
+      <p>Esta superficie no presenta ninguna colección. Se declara para que la ausencia sea deliberada.</p>
+    </section>
   </main>
 
-  <footer class="container py-4 text-body-secondary border-top">
+  <footer class="mq-contenedor mq-pie">
     <small>Lab-E2E.StaticHtml — laboratorio de pruebas E2E</small>
+    <small data-mq-sello></small>
   </footer>
 
   <script src="vendor/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="js/inicio.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

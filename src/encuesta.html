@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-AR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,195 +7,244 @@
   <link rel="stylesheet" href="vendor/bootstrap/bootstrap.min.css">
   <link rel="stylesheet" href="css/estilos.css">
 </head>
-<body class="bg-body-tertiary">
-  <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
-    <div class="container">
-      <a class="navbar-brand" href="index.html" data-testid="marca">Movilidad Urbana</a>
+<body data-superficie="Encuesta" data-destino="encuesta" data-estado-inicial="paso-1">
+  <a class="mq-skip" href="#mq-main">Ir al contenido</a>
+
+  <nav class="navbar navbar-expand-md mq-topbar" data-bs-theme="dark" aria-label="Navegación principal">
+    <div class="mq-contenedor">
+      <a class="mq-marca" href="index.html" data-testid="marca" data-mq-ico-marca>Movilidad Urbana</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
               aria-controls="menu" aria-expanded="false" aria-label="Alternar navegación">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="menu">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="index.html" data-testid="nav-inicio">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="localidades.html" data-testid="nav-localidades">Localidades</a></li>
-          <li class="nav-item"><a class="nav-link" href="encuesta.html" data-testid="nav-encuesta">Encuesta</a></li>
+        <ul class="mq-nav mq-ml-auto">
+          <li><a class="mq-nav__enlace" href="index.html" data-testid="nav-inicio" data-mq-destino="inicio">Inicio</a></li>
+          <li><a class="mq-nav__enlace" href="localidades.html" data-testid="nav-localidades" data-mq-destino="localidades">Localidades</a></li>
+          <li><a class="mq-nav__enlace" href="encuesta.html" data-testid="nav-encuesta" data-mq-destino="encuesta">Encuesta</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <main class="container py-4">
-    <h1 class="mb-4" data-testid="titulo">Encuesta de uso del transporte</h1>
-
-    <div class="card shadow-sm">
-      <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span data-testid="etiqueta-paso">Paso 1 de 3 — Datos de la persona</span>
-          <span class="badge text-bg-primary" data-testid="indicador-paso">1/3</span>
-        </div>
-        <div class="progress" role="progressbar" aria-label="Avance de la encuesta"
-             aria-valuemin="0" aria-valuemax="100" data-testid="progreso-contenedor">
-          <div class="progress-bar" id="barraProgreso" data-testid="progreso" style="width: 33%"></div>
-        </div>
+  <main id="mq-main" tabindex="-1" class="mq-contenedor mq-superficie">
+    <div class="mq-encabezado">
+      <div>
+        <h1 data-testid="titulo">Encuesta de uso del transporte</h1>
+        <p class="mq-caption mq-mt-3">Tres pasos. Lo cargado se conserva al volver atrás.</p>
       </div>
+    </div>
 
-      <div class="card-body">
-        <div id="aviso" class="alert alert-danger d-none" role="alert" data-testid="aviso"></div>
+    <div class="mq-tarjeta">
+      <div class="mq-tarjeta__cuerpo">
+        <!--
+          Los pasos son estados de la superficie: `paso-1`, `paso-2`, `paso-3` y `exito`. El
+          conmutador los releva del marcado, así que se puede abrir cualquiera por dirección con
+          `encuesta.html?estado=paso-3`.
+        -->
+        <nav class="mq-pasos" aria-label="Progreso de la encuesta">
+          <p class="mq-sr-only" role="status" aria-live="polite" data-mq-anuncio-paso></p>
+          <ol class="mq-pasos-lista">
+            <li class="mq-paso mq-paso--actual" data-mq-paso="1" aria-current="step">
+              <span class="mq-paso__marca" aria-hidden="true">1</span>
+              <span class="mq-paso__rotulo">Persona</span>
+            </li>
+            <li class="mq-paso mq-paso--pendiente" data-mq-paso="2">
+              <span class="mq-paso__marca" aria-hidden="true">2</span>
+              <span class="mq-paso__rotulo">Medios</span>
+            </li>
+            <li class="mq-paso mq-paso--pendiente" data-mq-paso="3">
+              <span class="mq-paso__marca" aria-hidden="true">3</span>
+              <span class="mq-paso__rotulo">Distancia</span>
+            </li>
+          </ol>
+        </nav>
 
-        <form id="formulario" novalidate data-testid="formulario">
+        <div class="mq-entre mq-mt-5">
+          <span class="mq-caption" data-testid="etiqueta-paso">Paso 1 de 3 — Datos de la persona</span>
+          <span class="mq-contador" data-testid="indicador-paso">1/3</span>
+        </div>
 
-          <!-- Paso 1: datos de la persona -->
-          <section data-paso="1" data-testid="paso-1">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="nombre" class="form-label">Nombre y apellido</label>
-                <input type="text" class="form-control" id="nombre" name="nombre"
-                       data-testid="campo-nombre" autocomplete="off" required maxlength="80">
-                <div class="invalid-feedback" data-testid="error-nombre"></div>
+        <div class="mq-progreso mq-mt-3" role="progressbar" aria-label="Avance de la encuesta"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="33"
+             data-testid="progreso-contenedor">
+          <div class="mq-progreso__barra mq-progreso__barra--1de3" id="barraProgreso"
+               data-testid="progreso"></div>
+        </div>
+
+        <p class="mq-banda mq-mt-5" id="aviso" role="status" data-testid="aviso" hidden></p>
+
+        <!-- `novalidate`: la validación por paso la resuelve `js/encuesta.js`, campo por campo. -->
+        <form id="formulario" class="mq-mt-5" novalidate data-testid="formulario"
+              data-mq-estado="paso-1 paso-2 paso-3">
+
+          <section data-mq-estado="paso-1" data-testid="paso-1" aria-labelledby="en-h1">
+            <h2 id="en-h1" class="mq-sr-only">Datos de la persona</h2>
+            <div class="mq-grilla-campos">
+              <div class="mq-campo">
+                <label class="mq-label" for="nombre">Nombre y apellido</label>
+                <input class="mq-input" type="text" id="nombre" name="nombre"
+                       data-testid="campo-nombre" autocomplete="name" required maxlength="80"
+                       aria-describedby="nombre-req nombre-error">
+                <span class="mq-requisito" id="nombre-req">Entre 3 y 80 caracteres.</span>
+                <span class="mq-error" id="nombre-error" data-testid="error-nombre" hidden></span>
               </div>
-              <div class="col-md-3">
-                <label for="edad" class="form-label">Edad</label>
-                <input type="number" class="form-control" id="edad" name="edad"
-                       data-testid="campo-edad" min="16" max="110" step="1" required>
-                <div class="invalid-feedback" data-testid="error-edad"></div>
+              <div class="mq-campo">
+                <label class="mq-label" for="edad">Edad</label>
+                <input class="mq-input" type="number" id="edad" name="edad"
+                       data-testid="campo-edad" min="16" max="110" step="1" required
+                       aria-describedby="edad-req edad-error">
+                <span class="mq-requisito" id="edad-req">Entre 16 y 110 años.</span>
+                <span class="mq-error" id="edad-error" data-testid="error-edad" hidden></span>
               </div>
-              <div class="col-md-3">
-                <label for="localidad" class="form-label">Localidad</label>
-                <select class="form-select" id="localidad" name="localidad"
-                        data-testid="campo-localidad" required>
+              <div class="mq-campo">
+                <label class="mq-label" for="localidad">Localidad</label>
+                <select class="mq-select" id="localidad" name="localidad"
+                        data-testid="campo-localidad" required
+                        aria-describedby="localidad-req localidad-error">
                   <option value="">Seleccione…</option>
                 </select>
-                <div class="form-text">Se completa con el ABM de localidades.</div>
-                <div class="invalid-feedback" data-testid="error-localidad"></div>
+                <span class="mq-requisito" id="localidad-req">Se completa con el ABM de localidades.</span>
+                <span class="mq-error" id="localidad-error" data-testid="error-localidad" hidden></span>
               </div>
             </div>
           </section>
 
-          <!-- Paso 2: medios que utiliza para viajar -->
-          <section data-paso="2" data-testid="paso-2" hidden>
-            <fieldset>
-              <legend class="h6">¿Qué medios utiliza para viajar? (uno o más)</legend>
-              <div class="row row-cols-1 row-cols-md-2 g-2" data-testid="grupo-medios">
-                <div class="col"><div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="medios" value="colectivo"
-                         id="medio-colectivo" data-testid="medio-colectivo">
-                  <label class="form-check-label" for="medio-colectivo">Colectivo</label>
-                </div></div>
-                <div class="col"><div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="medios" value="auto"
-                         id="medio-auto" data-testid="medio-auto">
-                  <label class="form-check-label" for="medio-auto">Auto particular</label>
-                </div></div>
-                <div class="col"><div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="medios" value="bicicleta"
-                         id="medio-bicicleta" data-testid="medio-bicicleta">
-                  <label class="form-check-label" for="medio-bicicleta">Bicicleta</label>
-                </div></div>
-                <div class="col"><div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="medios" value="moto"
-                         id="medio-moto" data-testid="medio-moto">
-                  <label class="form-check-label" for="medio-moto">Moto</label>
-                </div></div>
-                <div class="col"><div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="medios" value="caminata"
-                         id="medio-caminata" data-testid="medio-caminata">
-                  <label class="form-check-label" for="medio-caminata">A pie</label>
-                </div></div>
-                <div class="col"><div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="medios" value="tren"
-                         id="medio-tren" data-testid="medio-tren">
-                  <label class="form-check-label" for="medio-tren">Tren</label>
-                </div></div>
+          <section data-mq-estado="paso-2" data-testid="paso-2" aria-labelledby="en-h2">
+            <h2 id="en-h2" class="mq-sr-only">Medios que utiliza para viajar</h2>
+            <fieldset class="mq-grupo">
+              <legend class="mq-grupo__leyenda">¿Qué medios utiliza para viajar? (uno o más)</legend>
+              <div class="mq-grilla-campos" data-testid="grupo-medios">
+                <label class="mq-opcion" for="medio-colectivo">
+                  <input type="checkbox" name="medios" value="colectivo" id="medio-colectivo"
+                         data-testid="medio-colectivo"> Colectivo
+                </label>
+                <label class="mq-opcion" for="medio-auto">
+                  <input type="checkbox" name="medios" value="auto" id="medio-auto"
+                         data-testid="medio-auto"> Auto particular
+                </label>
+                <label class="mq-opcion" for="medio-bicicleta">
+                  <input type="checkbox" name="medios" value="bicicleta" id="medio-bicicleta"
+                         data-testid="medio-bicicleta"> Bicicleta
+                </label>
+                <label class="mq-opcion" for="medio-moto">
+                  <input type="checkbox" name="medios" value="moto" id="medio-moto"
+                         data-testid="medio-moto"> Moto
+                </label>
+                <label class="mq-opcion" for="medio-caminata">
+                  <input type="checkbox" name="medios" value="caminata" id="medio-caminata"
+                         data-testid="medio-caminata"> A pie
+                </label>
+                <label class="mq-opcion" for="medio-tren">
+                  <input type="checkbox" name="medios" value="tren" id="medio-tren"
+                         data-testid="medio-tren"> Tren
+                </label>
               </div>
-              <div class="text-danger small mt-2 d-none" data-testid="error-medios"></div>
+              <p class="mq-error mq-mt-3" data-testid="error-medios" hidden></p>
             </fieldset>
 
-            <div class="mt-4" style="max-width: 22rem">
-              <label for="frecuencia" class="form-label">Frecuencia de uso</label>
-              <select class="form-select" id="frecuencia" name="frecuencia"
-                      data-testid="campo-frecuencia" required>
+            <div class="mq-campo mq-ancho-22 mq-mt-5">
+              <label class="mq-label" for="frecuencia">Frecuencia de uso</label>
+              <select class="mq-select" id="frecuencia" name="frecuencia"
+                      data-testid="campo-frecuencia" required aria-describedby="frecuencia-error">
                 <option value="">Seleccione…</option>
                 <option value="diaria">Todos los días</option>
                 <option value="semanal">Algunos días por semana</option>
                 <option value="ocasional">Ocasionalmente</option>
               </select>
-              <div class="invalid-feedback" data-testid="error-frecuencia"></div>
+              <span class="mq-error" id="frecuencia-error" data-testid="error-frecuencia" hidden></span>
             </div>
           </section>
 
-          <!-- Paso 3: distancia recorrida -->
-          <section data-paso="3" data-testid="paso-3" hidden>
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label for="distancia" class="form-label">Distancia diaria (km)</label>
-                <input type="number" class="form-control" id="distancia" name="distancia"
-                       data-testid="campo-distancia" min="0" max="500" step="0.1" required>
-                <div class="invalid-feedback" data-testid="error-distancia"></div>
+          <section data-mq-estado="paso-3" data-testid="paso-3" aria-labelledby="en-h3">
+            <h2 id="en-h3" class="mq-sr-only">Distancia recorrida</h2>
+            <div class="mq-grilla-campos">
+              <div class="mq-campo">
+                <label class="mq-label" for="distancia">Distancia diaria (km)</label>
+                <input class="mq-input" type="number" id="distancia" name="distancia"
+                       data-testid="campo-distancia" min="0" max="500" step="0.1" required
+                       aria-describedby="distancia-req distancia-error">
+                <span class="mq-requisito" id="distancia-req">Entre 0 y 500 km.</span>
+                <span class="mq-error" id="distancia-error" data-testid="error-distancia" hidden></span>
               </div>
-              <div class="col-md-4">
-                <label for="minutos" class="form-label">Tiempo de viaje (minutos)</label>
-                <input type="number" class="form-control" id="minutos" name="minutos"
-                       data-testid="campo-minutos" min="1" max="600" step="1" required>
-                <div class="invalid-feedback" data-testid="error-minutos"></div>
+              <div class="mq-campo">
+                <label class="mq-label" for="minutos">Tiempo de viaje (minutos)</label>
+                <input class="mq-input" type="number" id="minutos" name="minutos"
+                       data-testid="campo-minutos" min="1" max="600" step="1" required
+                       aria-describedby="minutos-req minutos-error">
+                <span class="mq-requisito" id="minutos-req">Entre 1 y 600 minutos.</span>
+                <span class="mq-error" id="minutos-error" data-testid="error-minutos" hidden></span>
               </div>
-              <div class="col-md-4">
-                <label for="motivo" class="form-label">Motivo principal</label>
-                <select class="form-select" id="motivo" name="motivo" data-testid="campo-motivo" required>
+              <div class="mq-campo">
+                <label class="mq-label" for="motivo">Motivo principal</label>
+                <select class="mq-select" id="motivo" name="motivo" data-testid="campo-motivo"
+                        required aria-describedby="motivo-error">
                   <option value="">Seleccione…</option>
                   <option value="trabajo">Trabajo</option>
                   <option value="estudio">Estudio</option>
                   <option value="salud">Salud</option>
                   <option value="otros">Otros</option>
                 </select>
-                <div class="invalid-feedback" data-testid="error-motivo"></div>
+                <span class="mq-error" id="motivo-error" data-testid="error-motivo" hidden></span>
               </div>
             </div>
           </section>
         </form>
 
-        <!-- Resumen final -->
-        <section id="resumen" data-testid="resumen" hidden>
-          <div class="alert alert-success" role="alert" data-testid="mensaje-envio">
+        <!-- Acuse del envío: es el estado `exito` de la superficie, no un cuarto paso. -->
+        <section class="mq-mt-5" id="resumen" data-testid="resumen" data-mq-estado="exito"
+                 aria-labelledby="en-h4">
+          <h2 id="en-h4" class="mq-sr-only">Resumen de la encuesta registrada</h2>
+          <p class="mq-banda mq-banda--exito mq-mb-5" role="status" data-testid="mensaje-envio">
             Encuesta registrada. ¡Gracias por participar!
-          </div>
-          <dl class="row mb-0">
-            <dt class="col-sm-4">Persona</dt>
-            <dd class="col-sm-8" data-testid="resumen-persona"></dd>
-            <dt class="col-sm-4">Localidad</dt>
-            <dd class="col-sm-8" data-testid="resumen-localidad"></dd>
-            <dt class="col-sm-4">Medios</dt>
-            <dd class="col-sm-8" data-testid="resumen-medios"></dd>
-            <dt class="col-sm-4">Frecuencia</dt>
-            <dd class="col-sm-8" data-testid="resumen-frecuencia"></dd>
-            <dt class="col-sm-4">Distancia diaria</dt>
-            <dd class="col-sm-8" data-testid="resumen-distancia"></dd>
-            <dt class="col-sm-4">Tiempo de viaje</dt>
-            <dd class="col-sm-8" data-testid="resumen-minutos"></dd>
-            <dt class="col-sm-4">Motivo</dt>
-            <dd class="col-sm-8" data-testid="resumen-motivo"></dd>
+          </p>
+          <dl class="mq-kv">
+            <dt class="mq-kv__clave">Persona</dt>
+            <dd class="mq-kv__valor" data-testid="resumen-persona"></dd>
+            <dt class="mq-kv__clave">Localidad</dt>
+            <dd class="mq-kv__valor" data-testid="resumen-localidad"></dd>
+            <dt class="mq-kv__clave">Medios</dt>
+            <dd class="mq-kv__valor" data-testid="resumen-medios"></dd>
+            <dt class="mq-kv__clave">Frecuencia</dt>
+            <dd class="mq-kv__valor" data-testid="resumen-frecuencia"></dd>
+            <dt class="mq-kv__clave">Distancia diaria</dt>
+            <dd class="mq-kv__valor mq-num" data-testid="resumen-distancia"></dd>
+            <dt class="mq-kv__clave">Tiempo de viaje</dt>
+            <dd class="mq-kv__valor mq-num" data-testid="resumen-minutos"></dd>
+            <dt class="mq-kv__clave">Motivo</dt>
+            <dd class="mq-kv__valor" data-testid="resumen-motivo"></dd>
           </dl>
         </section>
       </div>
 
-      <div class="card-footer d-flex justify-content-between">
-        <button type="button" class="btn btn-outline-secondary" id="anterior"
-                data-testid="boton-anterior" disabled>Anterior</button>
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-primary" id="siguiente" data-testid="boton-siguiente">Siguiente</button>
-          <button type="button" class="btn btn-success d-none" id="finalizar" data-testid="boton-finalizar">Finalizar</button>
-          <button type="button" class="btn btn-outline-primary d-none" id="reiniciar" data-testid="boton-reiniciar">Nueva encuesta</button>
+      <!--
+        Dos botones conmutados por estado en lugar de uno con `disabled` alternado por script: el
+        momento del recorrido es un estado de la superficie, no una propiedad de un control.
+        «Anterior» sí va deshabilitado en el primer paso, que es lo que norma el catálogo §4.5.
+      -->
+      <div class="mq-tarjeta__pie">
+        <button type="button" class="mq-btn mq-btn--secundario" id="anterior"
+                data-testid="boton-anterior" data-mq-estado="paso-1 paso-2 paso-3"
+                disabled>Anterior</button>
+        <div class="mq-fila-acciones mq-ml-auto">
+          <button type="button" class="mq-btn mq-btn--primario" id="siguiente"
+                  data-testid="boton-siguiente" data-mq-estado="paso-1 paso-2">Siguiente</button>
+          <button type="button" class="mq-btn mq-btn--primario" id="finalizar"
+                  data-testid="boton-finalizar" data-mq-estado="paso-3">Registrar la encuesta</button>
+          <button type="button" class="mq-btn mq-btn--secundario" id="reiniciar"
+                  data-testid="boton-reiniciar" data-mq-estado="exito">Nueva encuesta</button>
         </div>
       </div>
     </div>
   </main>
 
-  <footer class="container py-4 text-body-secondary border-top">
+  <footer class="mq-contenedor mq-pie">
     <small>Lab-E2E.StaticHtml — laboratorio de pruebas E2E</small>
+    <small data-mq-sello></small>
   </footer>
 
   <script src="vendor/bootstrap/bootstrap.bundle.min.js"></script>
-  <script src="js/main.js"></script>
   <script src="js/encuesta.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
