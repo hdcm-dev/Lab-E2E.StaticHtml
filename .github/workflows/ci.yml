@@ -35,7 +35,7 @@ jobs:
   verificacion-rapida:
     name: Verificación rápida
     if: ${{ github.event.pull_request.draft != true }}
-    runs-on: [self-hosted, i7infra-dev]
+    runs-on: [self-hosted, ci-hdcm]
     timeout-minutes: 10
     container:
       image: mcr.microsoft.com/playwright:v1.62.1-noble
@@ -46,6 +46,7 @@ jobs:
         run: npm ci
 
       - name: Sintaxis del JavaScript del sitio y de las pruebas
+        shell: bash
         run: |
           set -euo pipefail
           for archivo in src/js/*.js tests/e2e/*.js playwright.config.js; do
@@ -75,7 +76,7 @@ jobs:
       ${{ always()
       && github.event_name == 'pull_request'
       && github.event.pull_request.head.repo.full_name == github.repository }}
-    runs-on: [self-hosted, i7infra-dev]
+    runs-on: [self-hosted, ci-hdcm]
     permissions:
       contents: read
       pull-requests: write
@@ -120,7 +121,7 @@ jobs:
     name: CI aprobada
     needs: [verificacion-rapida, e2e]
     if: always()
-    runs-on: [self-hosted, i7infra-dev]
+    runs-on: [self-hosted, ci-hdcm]
     steps:
       - name: Comprobar que ningún job previo falló
         shell: bash
