@@ -129,6 +129,7 @@ jobs:
         run: npm ci
 
       - name: Verificar que la versión de Playwright coincide con la imagen
+        shell: bash
         run: |
           set -euo pipefail
           esperada="$(node -p "require('./package.json').devDependencies['@playwright/test'].replace(/^[^0-9]*/, '')")"

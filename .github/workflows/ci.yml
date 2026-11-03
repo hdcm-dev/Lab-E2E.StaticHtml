@@ -46,6 +46,7 @@ jobs:
         run: npm ci
 
       - name: Sintaxis del JavaScript del sitio y de las pruebas
+        shell: bash
         run: |
           set -euo pipefail
           for archivo in src/js/*.js tests/e2e/*.js playwright.config.js; do
