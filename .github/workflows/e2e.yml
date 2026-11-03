@@ -83,7 +83,7 @@ jobs:
   # Convierte "cantidad de shards" y "lista de navegadores" en la matriz del job siguiente.
   preparar:
     name: Preparar matriz
-    runs-on: [self-hosted, i7infra-dev]
+    runs-on: [self-hosted, ci-hdcm]
     outputs:
       shards: ${{ steps.matriz.outputs.shards }}
       navegadores: ${{ steps.matriz.outputs.navegadores }}
@@ -107,7 +107,7 @@ jobs:
   pruebas:
     name: Pruebas (${{ matrix.navegador }} · shard ${{ matrix.shard }})
     needs: preparar
-    runs-on: [self-hosted, i7infra-dev]
+    runs-on: [self-hosted, ci-hdcm]
     timeout-minutes: 30
     # El contenedor oficial trae Node y los navegadores ya instalados: el runner self-hosted
     # no necesita mantener esas dependencias.
@@ -164,7 +164,7 @@ jobs:
     name: Reporte unificado
     needs: [preparar, pruebas]
     if: ${{ !cancelled() }}
-    runs-on: [self-hosted, i7infra-dev]
+    runs-on: [self-hosted, ci-hdcm]
     container:
       image: mcr.microsoft.com/playwright:v1.62.1-noble
     outputs:
